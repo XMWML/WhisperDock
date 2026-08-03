@@ -22,11 +22,13 @@ WhisperDock 支持 macOS 和 Linux，要求 Python 3.10 至 3.13。首次启动�
 
 ```bash
 cd /path/to/WhisperDock
-chmod +x bootstrap.sh run.sh run.command
+chmod +x bootstrap.sh run.sh run.command start-macos.command stop-macos.command
 ./run.sh
 ```
 
-浏览器打开 [http://127.0.0.1:8848](http://127.0.0.1:8848)。macOS 也可以双击 `run.command`；Linux/macOS 都可通过 `WHISPERDOCK_PORT=9000 ./run.sh` 修改端口。
+浏览器打开 [http://127.0.0.1:8848](http://127.0.0.1:8848)。在 macOS 上可以直接双击 `start-macos.command`（`run.command` 也是兼容入口）：它会在项目目录内后台启动服务、等待健康检查并打开浏览器。双击 `stop-macos.command` 可停止由启动器管理的服务。Linux/macOS 都可通过 `WHISPERDOCK_PORT=9000 ./run.sh` 修改端口。
+
+macOS 启动器的 PID 保存在 `workspace/whisperdock.pid`，日志保存在 `logs/whisperdock.log`；不会创建 LaunchAgent、系统级服务或写入项目目录外的应用状态。
 
 `imageio-ffmpeg` 会把兼容的 FFmpeg 二进制安装在项目虚拟环境内，通常不需要另装系统 FFmpeg。如果遇到特别少见的音频封装格式仍无法解析，可安装系统 `ffmpeg` 作为补充。
 

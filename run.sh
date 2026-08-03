@@ -6,7 +6,7 @@ APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT="${WHISPERDOCK_PORT:-8848}"
 
 if [ ! -x "$APP_ROOT/.venv/bin/python" ]; then
-  "$APP_ROOT/bootstrap.sh"
+  bash "$APP_ROOT/bootstrap.sh"
 fi
 
 mkdir -p "$APP_ROOT"/{cache/pip,cache/huggingface,cache/torch,cache/xdg,workspace/tmp,outputs,models,logs,config,.home}

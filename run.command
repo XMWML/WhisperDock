@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-"$(cd "$(dirname "$0")" && pwd)/run.sh"
+exec bash "$(cd "$(dirname "$0")" && pwd)/start-macos.command"
