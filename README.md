@@ -2,7 +2,7 @@
 
 一个以本地优先、可整体搬迁为目标的 Whisper 语音识别工作台。它在浏览器中提供完整 WebUI：管理模型、单条和批量识别、浏览和导出结果，以及分段近实时麦克风识别。
 
-默认识别引擎是官方 [openai/whisper](https://github.com/openai/whisper)。为兼容社区微调模型，WhisperDock 也可以通过 Transformers 加载 Hugging Face 上的 Whisper 模型，例如桌面 `whisper_cs` 项目使用的 [panlr/whisper-finetune-teochew](https://huggingface.co/panlr/whisper-finetune-teochew)。
+默认识别引擎是官方 [openai/whisper](https://github.com/openai/whisper)。为兼容社区微调模型，WhisperDock 也可以通过 Transformers 加载 Hugging Face 上的 Whisper 模型，例如公开的 [panlr/whisper-finetune-teochew](https://huggingface.co/panlr/whisper-finetune-teochew)。
 
 > 数据不离开本机。模型下载、Python 环境、缓存、上传临时文件、识别结果和日志都存入 WhisperDock 自己的文件夹，不会写到 `~/.cache`、`~/.cache/huggingface` 或系统临时目录。复制整个文件夹到外置硬盘或另一台相同架构的电脑即可带走模型和历史。
 
@@ -45,7 +45,7 @@ chmod +x bootstrap.sh run.sh run.command start.sh stop.sh start-macos.command st
 
 ### 潮汕话模型示例
 
-桌面上已有的 `whisper_cs` 项目使用 `panlr/whisper-finetune-teochew`，它是基于 `Whisper-medium` 的 Transformers 格式微调模型。添加时选择 **Transformers / Hugging Face**，来源填写：
+`panlr/whisper-finetune-teochew` 是基于 `Whisper-medium` 的 Transformers 格式潮汕话微调模型。添加时选择 **Transformers / Hugging Face**，来源填写：
 
 ```text
 panlr/whisper-finetune-teochew
