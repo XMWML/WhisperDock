@@ -22,13 +22,11 @@ WhisperDock 支持 macOS 和 Linux，要求 Python 3.10 至 3.13。首次启动�
 
 ```bash
 cd /path/to/WhisperDock
-chmod +x bootstrap.sh run.sh run.command start.sh stop.sh start-macos.command stop-macos.command start-linux.sh stop-linux.sh
+chmod +x bootstrap.sh run.sh start-macos.command start-linux.sh
 ./run.sh
 ```
 
-浏览器打开 [http://127.0.0.1:8848](http://127.0.0.1:8848)。需要后台一键启动时，macOS 直接双击 `start-macos.command`，Linux 在文件管理器中双击 `start-linux.sh`（或运行 `./start.sh`）；启动器会等待健康检查并尝试打开浏览器。对应的停止入口是 `stop-macos.command`、`stop-linux.sh` 或 `./stop.sh`。Linux/macOS 都可通过 `WHISPERDOCK_PORT=9000 ./run.sh` 修改端口。
-
-启动器的 PID 保存在 `workspace/whisperdock.pid`，日志保存在 `logs/whisperdock.log`；不会创建 LaunchAgent、systemd 服务或写入项目目录外的应用状态。
+`run.sh` 是跨平台的前台入口。macOS 可以双击 `start-macos.command`，Linux 可以运行 `./start-linux.sh`；两者都会保持当前命令行窗口打开，实时显示服务日志，并自动打开浏览器。按 `Ctrl+C` 停止服务，不再需要单独的停止脚本。日志同时保存到 `logs/whisperdock.log`，临时 PID 保存在 `workspace/whisperdock.pid`；不会创建 LaunchAgent、systemd 服务或写入项目目录外的应用状态。Linux/macOS 都可通过 `WHISPERDOCK_PORT=9000 ./run.sh` 修改端口。
 
 `imageio-ffmpeg` 会把兼容的 FFmpeg 二进制安装在项目虚拟环境内，通常不需要另装系统 FFmpeg。如果遇到特别少见的音频封装格式仍无法解析，可安装系统 `ffmpeg` 作为补充。
 

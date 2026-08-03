@@ -48,4 +48,4 @@ fi
 "$APP_ROOT/.venv/bin/python" -m pip install --upgrade pip wheel
 "$APP_ROOT/.venv/bin/python" -m pip install -r "$APP_ROOT/requirements.txt"
 
-echo "Ready. Start WhisperDock with: ./run.sh"
+echo "Ready. Start WhisperDock in the foreground with: ./run.sh"
