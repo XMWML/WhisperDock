@@ -1,0 +1,22 @@
+# Project-local runtime state.  Keeping these out of Git makes the source repository small,
+# while copying the complete project directory keeps the application and downloaded models portable.
+.venv/
+.runtime/
+runtime/
+.home/
+cache/*
+!cache/.gitkeep
+config/*
+!config/.gitkeep
+logs/*
+!logs/.gitkeep
+models/*
+!models/.gitkeep
+outputs/*
+!outputs/.gitkeep
+workspace/*
+!workspace/.gitkeep
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.DS_Store

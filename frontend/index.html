@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111927">
+  <meta name="description" content="WhisperDock - local Whisper speech recognition workspace">
+  <title>WhisperDock | 本地语音识别</title>
+  <link rel="icon" href="/frontend/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <div class="brand-name">WhisperDock</div>
+          <div class="brand-sub">本地语音工作台</div>
+        </div>
+      </div>
+
+      <nav class="primary-nav" aria-label="主导航">
+        <button class="nav-item active" data-view="studio" type="button">
+          <span class="nav-icon" aria-hidden="true">⌁</span><span>识别工作台</span><kbd>1</kbd>
+        </button>
+        <button class="nav-item" data-view="models" type="button">
+          <span class="nav-icon" aria-hidden="true">▣</span><span>模型管理</span><span class="nav-count" id="model-count">0</span>
+        </button>
+        <button class="nav-item" data-view="history" type="button">
+          <span class="nav-icon" aria-hidden="true">◷</span><span>识别历史</span><kbd>3</kbd>
+        </button>
+        <button class="nav-item" data-view="settings" type="button">
+          <span class="nav-icon" aria-hidden="true">⚙</span><span>设置与帮助</span><kbd>4</kbd>
+        </button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="storage-card">
+        <div class="storage-heading"><span class="status-dot" id="health-dot"></span><span>本地服务</span><strong id="health-label">检查中</strong></div>
+        <div class="storage-path" title="所有数据均位于项目目录">数据保存在项目文件夹</div>
+        <div class="storage-meter"><span id="storage-meter-fill"></span></div>
+        <div class="storage-foot"><span id="storage-used">--</span><span id="storage-total">可迁移</span></div>
+      </div>
+      <div class="sidebar-footer"><span>WhisperDock</span><span class="version" id="app-version">v0.1</span></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" type="button" aria-label="打开导航">☰</button>
+        <div class="breadcrumbs"><span id="breadcrumb-section">识别工作台</span><span class="crumb-separator">/</span><strong id="breadcrumb-current">新建任务</strong></div>
+        <div class="topbar-actions">
+          <div class="service-state" id="service-state"><span class="status-dot"></span><span>服务连接中</span></div>
+          <button class="icon-btn" id="refresh-btn" title="刷新数据" type="button">↻</button>
+          <button class="avatar" title="本地模式" type="button">WD</button>
+        </div>
+      </header>
+
+      <div class="view-container">
+        <!-- Studio -->
+        <section class="view active" id="view-studio" data-view-panel="studio">
+          <div class="view-header studio-header">
+            <div>
+              <p class="eyebrow">LOCAL WHISPER WORKSPACE</p>
+              <h1>把声音留在本地。</h1>
+              <p class="view-description">导入一段音频，或直接录音。模型和结果均保存在当前项目目录，复制文件夹即可迁移。</p>
+            </div>
+            <div class="quick-stat-row">
+              <div class="quick-stat"><span>当前模型</span><strong id="active-model-name">未加载</strong></div>
+              <div class="quick-stat"><span>今日任务</span><strong id="today-count">0</strong></div>
+            </div>
+          </div>
+
+          <div class="studio-grid">
+            <div class="studio-primary">
+              <div class="panel intake-panel">
+                <div class="panel-heading">
+                  <div><h2>新建识别任务</h2><p>支持 WAV、MP3、M4A、FLAC、OGG 等常见格式</p></div>
+                  <span class="step-label">01 / 输入</span>
+                </div>
+                <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="选择或拖入音频">
+                  <input type="file" id="audio-input" accept="audio/*,video/*" multiple hidden>
+                  <div class="drop-icon" aria-hidden="true">↑</div>
+                  <h3>拖入音频文件</h3>
+                  <p>或 <button class="text-btn" id="browse-btn" type="button">从文件夹选择</button></p>
+                  <small>单次可添加多个文件，批量任务会按顺序处理</small>
+                </div>
+                <div class="record-strip">
+                  <div class="record-copy"><span class="mic-icon" aria-hidden="true">●</span><div><strong>现场录音</strong><span>使用浏览器麦克风录制一段语音</span></div></div>
+                  <div class="record-actions"><div class="record-mode" role="group" aria-label="录音模式"><button class="record-mode-btn active" data-record-mode="file" type="button">录音后识别</button><button class="record-mode-btn" data-record-mode="realtime" type="button">分段实时</button></div><span class="record-timer" id="record-timer">00:00</span><button class="record-btn" id="record-btn" type="button"><span class="record-dot"></span><span id="record-label">开始录音</span></button></div>
+                </div>
+                <div class="live-panel" id="live-panel" hidden><div class="live-heading"><span class="status-dot online"></span><strong id="live-status">正在等待音频片段</strong><span id="live-pending"></span></div><pre class="live-transcript" id="live-transcript">实时结果会显示在这里。</pre></div>
+                <div class="file-queue" id="file-queue" hidden>
+                  <div class="queue-heading"><span>待识别文件</span><button class="text-btn subtle" id="clear-queue-btn" type="button">清空</button></div>
+                  <div id="queue-items"></div>
+                </div>
+              </div>
+
+              <div class="panel result-panel" id="result-panel" hidden>
+                <div class="panel-heading result-heading">
+                  <div><h2>识别结果</h2><p id="result-meta">任务完成</p></div>
+                  <div class="result-actions"><button class="secondary-btn" id="copy-result-btn" type="button">复制文本</button><button class="primary-btn compact" id="download-result-btn" type="button">下载结果</button></div>
+                </div>
+                <div class="result-tabs" role="tablist"><button class="result-tab active" data-result-tab="text" type="button">纯文本</button><button class="result-tab" data-result-tab="segments" type="button">时间轴</button><button class="result-tab" data-result-tab="json" type="button">JSON</button></div>
+                <div class="result-body"><pre id="result-text" class="result-text">识别结果将在这里显示。</pre><div id="result-segments" class="segments-list" hidden></div><pre id="result-json" class="result-text mono" hidden></pre></div>
+              </div>
+            </div>
+
+            <aside class="studio-settings">
+              <div class="panel settings-panel">
+                <div class="panel-heading compact-heading"><div><h2>识别参数</h2><p>Whisper 完整参数入口</p></div><span class="step-label">02 / 配置</span></div>
+                <div class="field-group"><label for="model-select">使用模型</label><div class="select-with-action"><select id="model-select"><option value="">加载模型后可选</option></select><button class="mini-btn" id="manage-models-btn" title="管理模型" type="button">＋</button></div><div class="field-hint" id="model-hint">请先在模型管理中下载并加载模型</div></div>
+                <div class="field-row"><div class="field-group"><label for="language-select">语言</label><select id="language-select"><option value="auto">自动检测</option><option value="zh">中文</option><option value="en">English</option><option value="yue">粤语</option><option value="nan">潮汕话 / 闽南语</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="ru">Русский</option></select></div><div class="field-group"><label for="task-select">任务</label><select id="task-select"><option value="transcribe">转录</option><option value="translate">翻译为英文</option></select></div></div>
+                <div class="field-row"><div class="field-group"><label for="temperature">Temperature <span class="info-dot" title="可填单值，或 0,0.2,0.4 这样的回退温度列表">?</span></label><input id="temperature" type="text" value="0" placeholder="0 或 0,0.2,0.4"></div><div class="field-group"><label for="beam-size">Beam size</label><input id="beam-size" type="number" min="1" max="20" step="1" placeholder="默认"></div></div>
+                <div class="advanced-toggle"><button class="disclosure-btn" id="advanced-toggle" type="button" aria-expanded="false"><span>展开高级参数</span><span class="chevron">⌄</span></button></div>
+                <div class="advanced-fields" id="advanced-fields" hidden>
+                  <div class="field-row"><div class="field-group"><label for="best-of">Best of</label><input id="best-of" type="number" min="1" max="20" placeholder="默认"></div><div class="field-group"><label for="patience">Patience</label><input id="patience" type="number" min="0" step="0.1" placeholder="默认"></div></div>
+                  <div class="field-row"><div class="field-group"><label for="length-penalty">Length penalty</label><input id="length-penalty" type="number" min="-2" step="0.1" placeholder="默认"></div><div class="field-group"><label for="compression-ratio">压缩比阈值</label><input id="compression-ratio" type="number" min="0" step="0.1" placeholder="2.4"></div></div>
+                  <div class="field-row"><div class="field-group"><label for="logprob-threshold">Logprob 阈值</label><input id="logprob-threshold" type="number" step="0.1" placeholder="-1"></div><div class="field-group"><label for="no-speech-threshold">静音阈值</label><input id="no-speech-threshold" type="number" min="0" max="1" step="0.05" placeholder="0.6"></div></div>
+                  <div class="field-row"><div class="field-group"><label for="sample-len">Sample length</label><input id="sample-len" type="number" min="1" step="1" placeholder="默认"></div><div class="field-group"><label for="max-initial-timestamp">首段最大时间戳</label><input id="max-initial-timestamp" type="number" min="0" step="0.1" placeholder="默认"></div></div>
+                  <div class="field-row"><div class="field-group"><label for="hallucination-silence">幻觉静音阈值</label><input id="hallucination-silence" type="number" min="0" step="0.1" placeholder="默认"></div><div class="field-group"><label for="clip-timestamps">剪辑时间段</label><input id="clip-timestamps" type="text" placeholder="例如 0,30,60"></div></div>
+                  <div class="field-group"><label for="initial-prompt">Initial prompt</label><textarea id="initial-prompt" rows="2" placeholder="可选：提供专有名词或上下文"></textarea></div>
+                  <div class="field-row"><div class="field-group"><label for="prompt">Prompt tokens</label><input id="prompt" type="text" placeholder="可选 token ID 列表"></div><div class="field-group"><label for="prefix">Prefix</label><input id="prefix" type="text" placeholder="可选的输出前缀"></div></div>
+                  <div class="field-group"><label for="hotwords">附加术语</label><input id="hotwords" type="text" placeholder="可选：产品名、术语，以逗号分隔（会并入提示词）"></div>
+                  <div class="field-group"><label for="suppress-tokens">Suppress tokens</label><input id="suppress-tokens" type="text" placeholder="例如 -1，逗号分隔 token ID"></div>
+                  <div class="field-row"><div class="field-group"><label for="prepend-punctuations">前置标点</label><input id="prepend-punctuations" type="text" placeholder="默认"></div><div class="field-group"><label for="append-punctuations">后置标点</label><input id="append-punctuations" type="text" placeholder="默认"></div></div>
+                  <div class="field-row"><div class="field-group"><label for="verbose-select">详细日志</label><select id="verbose-select"><option value="false">关闭</option><option value="true">开启</option><option value="live">实时输出</option></select></div><div class="field-group"><label for="threads">CPU 线程数</label><input id="threads" type="number" min="0" step="1" placeholder="自动"></div></div>
+                  <div class="toggle-grid"><label class="toggle-control"><input id="word-timestamps" type="checkbox"><span class="toggle-ui"></span><span>词级时间戳</span></label><label class="toggle-control"><input id="condition-previous" type="checkbox" checked><span class="toggle-ui"></span><span>延续前文</span></label><label class="toggle-control"><input id="fp16" type="checkbox" checked><span class="toggle-ui"></span><span>FP16（GPU）</span></label><label class="toggle-control"><input id="suppress-blank" type="checkbox" checked><span class="toggle-ui"></span><span>抑制空白输出</span></label><label class="toggle-control"><input id="without-timestamps" type="checkbox"><span class="toggle-ui"></span><span>不生成时间戳</span></label><label class="toggle-control"><input id="carry-initial-prompt" type="checkbox"><span class="toggle-ui"></span><span>持续使用提示词</span></label></div>
+                </div>
+                <div class="field-group"><label for="output-format">输出格式</label><select id="output-format"><option value="txt">纯文本 (.txt)</option><option value="srt">字幕 (.srt)</option><option value="vtt">WebVTT (.vtt)</option><option value="json">JSON (.json)</option><option value="all">全部格式</option></select></div>
+                <button class="primary-btn full" id="transcribe-btn" type="button" disabled><span class="button-icon">✦</span><span>开始识别</span><span class="shortcut">⌘ ↵</span></button>
+                <div class="job-progress" id="job-progress" hidden><div class="progress-label"><span id="progress-status">正在准备...</span><span id="progress-percent">0%</span></div><div class="progress-track"><span id="progress-fill"></span></div><button class="text-btn subtle" id="cancel-job-btn" type="button">取消任务</button></div>
+              </div>
+              <div class="tip-card"><span class="tip-icon">i</span><div><strong>小提示</strong><p>首次使用请在「模型管理」中下载模型。large-v3 精度高但需要更多显存。</p></div></div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- Models -->
+        <section class="view" id="view-models" data-view-panel="models">
+          <div class="view-header"><div><p class="eyebrow">MODEL LIBRARY</p><h1>模型管理</h1><p class="view-description">模型文件保存在 <code>models/</code>，可随项目文件夹一起迁移。</p></div><button class="primary-btn" id="add-model-btn" type="button"><span class="button-icon">＋</span>添加模型</button></div>
+          <div class="model-toolbar"><div class="search-field"><span>⌕</span><input id="model-search" type="search" placeholder="搜索模型名称或 ID"></div><div class="toolbar-filters"><select id="model-filter"><option value="all">全部状态</option><option value="loaded">已加载</option><option value="downloaded">已下载</option><option value="remote">未下载</option></select><button class="icon-btn" id="model-refresh-btn" title="刷新模型列表" type="button">↻</button></div></div>
+          <div class="model-grid" id="model-grid"><div class="empty-state"><span class="empty-icon">◌</span><h3>正在读取模型目录</h3><p>稍等片刻...</p></div></div>
+          <div class="model-info-band"><div class="info-band-icon">⌂</div><div><strong>下载后即可离线使用</strong><p>从 Hugging Face 下载的模型会存放在当前项目目录，不会写入系统缓存。完整复制 WhisperDock 文件夹到外置硬盘即可继续使用。</p></div><button class="text-btn" data-view-link="settings" type="button">查看存储设置 →</button></div>
+        </section>
+
+        <!-- History -->
+        <section class="view" id="view-history" data-view-panel="history">
+          <div class="view-header"><div><p class="eyebrow">TRANSCRIPTION LOG</p><h1>识别历史</h1><p class="view-description">所有任务记录保存在项目目录的 <code>workspace/history</code>。</p></div><button class="secondary-btn" id="export-history-btn" type="button"><span class="button-icon">↓</span>导出记录</button></div>
+          <div class="history-toolbar"><div class="search-field wide"><span>⌕</span><input id="history-search" type="search" placeholder="搜索文件名、内容或模型"></div><div class="date-filter"><select id="history-date-filter"><option value="all">全部时间</option><option value="today">今天</option><option value="week">最近 7 天</option><option value="month">最近 30 天</option></select></div></div>
+          <div class="panel table-panel"><div class="table-wrap"><table class="history-table"><thead><tr><th>文件</th><th>状态</th><th>模型</th><th>语言</th><th>时长</th><th>完成时间</th><th></th></tr></thead><tbody id="history-body"><tr class="table-empty"><td colspan="7"><span class="empty-icon">◷</span><strong>还没有识别记录</strong><small>完成一项识别任务后，结果会出现在这里</small></td></tr></tbody></table></div><div class="table-footer"><span id="history-summary">0 条记录</span><div class="pagination" id="history-pagination"></div></div></div>
+        </section>
+
+        <!-- Settings -->
+        <section class="view" id="view-settings" data-view-panel="settings">
+          <div class="view-header"><div><p class="eyebrow">WORKSPACE PREFERENCES</p><h1>设置与帮助</h1><p class="view-description">让 WhisperDock 在你的设备和工作流中保持可预测。</p></div></div>
+          <div class="settings-layout">
+            <div class="settings-main">
+              <div class="panel preference-panel"><div class="panel-heading"><div><h2>工作区</h2><p>可迁移存储的基础设置</p></div></div><div class="preference-row"><div><strong>项目数据目录</strong><span class="preference-note">模型、缓存、历史和导出文件都放在项目文件夹内</span></div><div class="path-control"><code id="workspace-path">./</code><button class="mini-btn" id="open-workspace-btn" title="在文件管理器中打开" type="button">↗</button></div></div><div class="preference-row"><div><strong>完成后保留临时音频</strong><span class="preference-note">关闭后，识别完成会自动清理工作区临时副本</span></div><label class="toggle-control"><input id="keep-temp" type="checkbox"><span class="toggle-ui"></span></label></div><div class="preference-row"><div><strong>启动时检查模型</strong><span class="preference-note">打开页面时读取本地模型状态</span></div><label class="toggle-control"><input id="check-models" type="checkbox" checked><span class="toggle-ui"></span></label></div></div>
+              <div class="panel preference-panel"><div class="panel-heading"><div><h2>默认参数</h2><p>这些值会自动带入每次新任务</p></div><button class="text-btn" id="reset-preferences" type="button">恢复默认</button></div><div class="field-row"><div class="field-group"><label for="default-language">默认语言</label><select id="default-language"><option value="auto">自动检测</option><option value="zh">中文</option><option value="en">English</option><option value="nan">潮汕话 / 闽南语</option></select></div><div class="field-group"><label for="default-format">默认输出格式</label><select id="default-format"><option value="txt">纯文本 (.txt)</option><option value="srt">字幕 (.srt)</option><option value="vtt">WebVTT (.vtt)</option><option value="json">JSON (.json)</option><option value="all">全部格式</option></select></div></div><div class="field-group"><label for="default-device">默认推理设备</label><select id="default-device"><option value="auto">自动选择</option><option value="cpu">CPU</option><option value="mps">Apple Silicon (MPS)</option><option value="cuda">NVIDIA CUDA</option></select><div class="field-hint">变更后，请在模型管理页重新加载模型。</div></div><div class="field-group"><label for="default-prompt">默认提示词</label><textarea id="default-prompt" rows="2" placeholder="可选的上下文提示"></textarea></div></div>
+            </div>
+            <aside class="help-column"><div class="panel help-panel"><div class="help-heading"><span class="help-badge">?</span><div><h2>如何添加自定义模型？</h2><p>WhisperDock 支持 Hugging Face 仓库、直接检查点或本地模型目录。</p></div></div><ol class="help-steps"><li><span>1</span><div><strong>Hugging Face 微调模型</strong><p>在 <a href="https://huggingface.co/models?pipeline_tag=automatic-speech-recognition" target="_blank" rel="noreferrer">Hugging Face 语音识别模型</a> 中复制 <code>owner/model-name</code> 仓库 ID，例如 <code>panlr/whisper-finetune-teochew</code>；来源类型选「Hugging Face 仓库」，引擎使用 transformers。</p></div></li><li><span>2</span><div><strong>官方或自定义单文件检查点</strong><p>直接链接必须是完整 HTTPS 地址，且直接指向一个 <code>.pt</code>、<code>.bin</code> 或 <code>.ckpt</code> 文件；不要填模型网页、目录地址或 ZIP 压缩包。此类型使用 openai-whisper。</p></div></li><li><span>3</span><div><strong>导入本地模型</strong><p>本地 OpenAI 模型应为单个检查点文件；Transformers 模型应为包含 config 和权重文件的完整目录。导入后文件会复制进项目目录。</p></div></li></ol><div class="help-note">提示：桌面的 <code>whisper_cs</code> 项目可作为潮汕话微调模型的参考。下载前请确认磁盘空间和许可证。</div></div><div class="panel about-panel"><span class="about-mark">W</span><div><strong>WhisperDock</strong><p>本地优先、可迁移的 Whisper 工作台</p><small id="about-version">版本 v0.1.0</small></div><button class="text-btn" id="check-update-btn" type="button">检查更新</button></div></aside>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add model dialog -->
+  <dialog class="modal" id="model-dialog">
+    <form method="dialog" class="modal-card" id="model-form">
+      <div class="modal-header"><div><p class="eyebrow">MODEL LIBRARY</p><h2>添加模型</h2></div><button class="modal-close" value="cancel" aria-label="关闭" type="submit" formnovalidate>×</button></div>
+      <p class="modal-lead">下载完成后模型会保存在项目内的 <code>models/</code>，可直接复制整个文件夹迁移。</p>
+      <div class="field-group"><label for="model-name-input">显示名称 <span class="required">*</span></label><input id="model-name-input" required placeholder="例如：Whisper Large v3"></div>
+      <div class="field-group"><label for="model-id-input">模型 ID 或下载链接 <span class="required">*</span></label><input id="model-id-input" required placeholder="owner/model-name 或 https://.../model.pt"><div class="field-hint">Hugging Face 仓库使用 transformers，例如 <code>panlr/whisper-finetune-teochew</code>。直接链接仅支持 HTTPS 的单个 <code>.pt</code>、<code>.bin</code> 或 <code>.ckpt</code> OpenAI 检查点。</div></div>
+      <div class="field-row"><div class="field-group"><label for="model-size-input">模型大小</label><select id="model-size-input"><option value="tiny">tiny · 75 MB</option><option value="base">base · 145 MB</option><option value="small">small · 465 MB</option><option value="medium">medium · 1.5 GB</option><option value="large-v3" selected>large-v3 · 3 GB</option><option value="custom">自定义 / 微调模型</option></select></div><div class="field-group"><label for="model-backend-input">推理引擎</label><select id="model-backend-input"><option value="openai-whisper">openai-whisper（官方）</option><option value="transformers">transformers（Hugging Face）</option></select></div></div>
+      <div class="field-group"><label for="model-source-type-input">来源类型</label><select id="model-source-type-input"><option value="auto">自动识别</option><option value="huggingface">Hugging Face 仓库（Transformers）</option><option value="url">HTTPS 单文件检查点（OpenAI）</option><option value="local">本地模型路径</option></select></div>
+      <div class="field-group"><label for="model-notes-input">备注 <span class="optional">可选</span></label><textarea id="model-notes-input" rows="2" placeholder="例如：潮汕话微调，来源于 whisper_cs"></textarea></div>
+      <div class="modal-footer"><button class="secondary-btn" value="cancel" type="submit" formnovalidate>取消</button><button class="primary-btn" id="submit-model-btn" value="default" type="submit"><span class="button-icon">↓</span>开始下载</button></div>
+    </form>
+  </dialog>
+
+  <!-- Model details dialog -->
+  <dialog class="modal" id="model-details-dialog"><div class="modal-card model-detail-card"><div class="modal-header"><div><p class="eyebrow">MODEL DETAILS</p><h2 id="detail-model-name">模型详情</h2></div><button class="modal-close" id="close-details-btn" type="button" aria-label="关闭">×</button></div><div id="model-detail-body"></div></div></dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="/frontend/app.js"></script>
+</body>
+</html>
