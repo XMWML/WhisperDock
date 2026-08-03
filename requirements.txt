@@ -15,5 +15,6 @@ torch>=2.2
 # Optional community-model adapter. Required for Hugging Face folders such as
 # panlr/whisper-finetune-teochew; harmless for built-in OpenAI models.
 transformers>=4.45
+accelerate>=0.26
 huggingface-hub>=0.26
 safetensors>=0.4
