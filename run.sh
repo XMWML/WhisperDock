@@ -20,4 +20,5 @@ export HOME="$APP_ROOT/.home"
 export PYTHONPYCACHEPREFIX="$APP_ROOT/cache/pycache"
 export WHISPERDOCK_ROOT="$APP_ROOT"
 
+cd "$APP_ROOT"
 exec "$APP_ROOT/.venv/bin/python" -m uvicorn backend.main:app --host 127.0.0.1 --port "$PORT"

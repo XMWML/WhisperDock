@@ -2,7 +2,7 @@
 
 一个以本地优先、可整体搬迁为目标的 Whisper 语音识别工作台。它在浏览器中提供完整 WebUI：管理模型、单条和批量识别、浏览和导出结果，以及分段近实时麦克风识别。
 
-默认识别引擎是官方 [openai/whisper](https://github.com/openai/whisper)。为兼容社区微调模型，WhisperDock 也可以通过 Transformers 加载 Hugging Face 上的 Whisper 模型，例如公开的 [panlr/whisper-finetune-teochew](https://huggingface.co/panlr/whisper-finetune-teochew)。
+默认识别引擎是官方 [openai/whisper](https://github.com/openai/whisper)。为兼容社区微调模型，WhisperDock 也可以通过 Transformers 加载 Hugging Face 上的 Whisper 模型。
 
 > 数据不离开本机。模型下载、Python 环境、缓存、上传临时文件、识别结果和日志都存入 WhisperDock 自己的文件夹，不会写到 `~/.cache`、`~/.cache/huggingface` 或系统临时目录。复制整个文件夹到外置硬盘或另一台相同架构的电脑即可带走模型和历史。
 
@@ -39,19 +39,19 @@ chmod +x bootstrap.sh run.sh run.command start.sh stop.sh start-macos.command st
 | 想使用的模型 | 选择的引擎 | 来源栏应填写 | 去哪里找 |
 | --- | --- | --- | --- |
 | 官方通用模型 | `OpenAI Whisper` | 模型大小，例如 `base` 或 `turbo` | WebUI 内置模型库；官方 [Available models](https://github.com/openai/whisper#available-models) |
-| Hugging Face 微调 Whisper | `Transformers / Hugging Face` | 仓库 ID，例如 `panlr/whisper-finetune-teochew`，或对应 Hugging Face 链接 | [Hugging Face Models](https://huggingface.co/models?pipeline_tag=automatic-speech-recognition&sort=trending) |
+| Hugging Face 微调 Whisper | `Transformers / Hugging Face` | 仓库 ID，例如 `owner/whisper-finetuned-model`，或对应 Hugging Face 链接 | [Hugging Face Models](https://huggingface.co/models?pipeline_tag=automatic-speech-recognition&sort=trending) |
 | OpenAI Whisper 权重文件 | `OpenAI Whisper` | 可直接下载的、以 `.pt`、`.bin` 或 `.ckpt` 结尾的模型文件 URL | 官方模型链接或模型发布者给出的直链；不能填网页预览页 |
 | 已拥有的本地模型 | 与模型格式对应 | 项目 `models/` 下的相对路径 | 将整个 Transformers 模型目录或 `.pt`/`.bin`/`.ckpt` 文件放入项目 `models/` 后添加 |
 
-### 潮汕话模型示例
+### 微调模型示例
 
-`panlr/whisper-finetune-teochew` 是基于 `Whisper-medium` 的 Transformers 格式潮汕话微调模型。添加时选择 **Transformers / Hugging Face**，来源填写：
+添加 Transformers 格式的微调模型时，选择 **Transformers / Hugging Face**，填写对应的 Hugging Face 仓库 ID：
 
 ```text
-panlr/whisper-finetune-teochew
+owner/whisper-finetuned-model
 ```
 
-下载后的模型会进入 `models/huggingface/`，不会复用或污染原项目的 `.hf_cache/`。该模型的说明和许可请以其 Hugging Face 页面为准。
+下载后的模型会进入 `models/huggingface/`。模型说明和许可请以对应的 Hugging Face 页面为准。
 
 ### 选择大小
 
