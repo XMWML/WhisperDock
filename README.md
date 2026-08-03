@@ -30,6 +30,53 @@ chmod +x bootstrap.sh run.sh start-macos.command start-linux.sh
 
 `imageio-ffmpeg` 会把兼容的 FFmpeg 二进制安装在项目虚拟环境内，通常不需要另装系统 FFmpeg。如果遇到特别少见的音频封装格式仍无法解析，可安装系统 `ffmpeg` 作为补充。
 
+## 一键部署 / One-click deployment
+
+发布页提供两个自包含安装脚本：`install-macos.command` 和 `install-linux.sh`。它们会自动新建本地目录、克隆指定 release/tag、创建项目内 `.venv`、安装依赖并以前台模式启动 WhisperDock。日志会实时显示在当前终端里，按 `Ctrl+C` 即可停止。
+
+The release page includes two self-contained installers: `install-macos.command` and `install-linux.sh`. Each script creates a fresh local folder, clones the selected release or tag, creates a project-local `.venv`, installs dependencies, and starts WhisperDock in the foreground with live logs. Press `Ctrl+C` to stop it.
+
+前提 / Prerequisites:
+
+- `git`
+- `curl`
+- Python 3.10 至 3.13，或安装 `uv` 让 `bootstrap.sh` 自动下载项目内 Python
+- Python 3.10 to 3.13, or `uv` so `bootstrap.sh` can install a project-local Python automatically
+
+macOS:
+
+```bash
+curl -L -o install-macos.command https://github.com/XMWML/WhisperDock/releases/download/v0.1.0/install-macos.command
+chmod +x install-macos.command
+./install-macos.command
+```
+
+Linux:
+
+```bash
+curl -L -o install-linux.sh https://github.com/XMWML/WhisperDock/releases/download/v0.1.0/install-linux.sh
+chmod +x install-linux.sh
+./install-linux.sh
+```
+
+可选安装目录 / Optional target directory:
+
+```bash
+./install-macos.command /path/to/WhisperDock
+./install-linux.sh /path/to/WhisperDock
+```
+
+也可以通过环境变量覆盖默认 release/tag 或仓库地址：
+
+You can also override the default release/tag or repository URL with environment variables:
+
+```bash
+WHISPERDOCK_REF=v0.1.0 ./install-linux.sh
+WHISPERDOCK_REPO_URL=https://github.com/XMWML/WhisperDock.git ./install-macos.command
+```
+
+默认目标目录是 `~/WhisperDock`。如果该目录已存在，安装脚本会直接退出，不会覆盖已有文件。The default target directory is `~/WhisperDock`. If it already exists, the installer exits without overwriting it.
+
 ## 模型指南
 
 在「模型」页点击「添加模型」，选择引擎后填写来源。内置模型先点击「下载」，自定义模型提交后会立即下载；下载完成后点击「加载」才会占用内存。
